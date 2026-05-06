@@ -1,0 +1,112 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    @if (doctor(); as doctor) {
+    <mat-card class="doctor-profile-card mat-elevation-z3">
+      <div class="profile-header">
+        <div class="icon-blob">
+          <mat-icon>medical_services</mat-icon>
+        </div>
+        <h2>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h2>
+        <span class="specialty-tag">{{ doctor.specialization }}</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="profile-details">
+        <div class="info-row">
+          <mat-icon>verified_user</mat-icon>
+          <div>
+            <label>License Number</label>
+            <p>{{ doctor.licenseNumber }}</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <mat-icon>phone_iphone</mat-icon>
+          <div>
+            <label>Contact Number</label>
+            <p>{{ doctor.phone }}</p>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+    }
+  </aside>
+
+  <main class="schedule-content">
+    <div class="content-header">
+        <mat-icon>calendar_today</mat-icon>
+        <h1>Daily Appointment Schedule</h1>
+    </div>
+
+    <div class="slot-container">
+      @for (slot of slots(); track slot.id) {
+      <mat-expansion-panel class="slot-panel" [class.full]="slot.bookedCount >= slot.capacity">
+        <mat-expansion-panel-header expandedHeight="70px" collapsedHeight="70px">
+          <mat-panel-title>
+            <div class="date-box">
+                <span class="day">{{ slot.date }}</span>
+              </div>
+            <div class="time-block">
+              <mat-icon>alarm</mat-icon>
+              <span>{{ slot.startTime.slice(0, 5) }} - {{ slot.endTime.slice(0, 5) }}</span>
+            </div>
+          </mat-panel-title>
+          <mat-panel-description>
+            <div class="capacity-indicator">
+              <mat-progress-bar mode="determinate" 
+                [value]="(slot.bookedCount / slot.capacity) * 100">
+              </mat-progress-bar>
+              <span>{{ slot.bookedCount }} / {{ slot.capacity }} Booked</span>
+            </div>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="appointment-list">
+          @for (app of slot.appointments; track app.id) {
+          <mat-expansion-panel class="patient-expansion mat-elevation-z0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="patient-icon">person</mat-icon>
+                <strong>{{ app.patient.firstName }} {{ app.patient.lastName }}</strong>
+              </mat-panel-title>
+              <mat-panel-description>
+                <span class="status-pill" [attr.data-status]="app.status">{{ app.status }}</span>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="patient-info-grid">
+              <div class="data-group">
+                <label>Vitals & Details</label>
+                <p>Age: {{ app.patient.age }} • {{ app.patient.gender }}</p>
+                <p>Blood Group: <span>{{ BloodGroupLabel[app.patient.bloodGroup] }}</span></p>
+              </div>
+              <div class="data-group">
+                <label>Patient Contact</label>
+                <p>{{ app.patient.phone }}</p>
+              </div>
+              <div class="data-group">
+                <label>Reason for Consultation</label>
+                <p class="reason-text">{{ app.reason }}</p>
+              </div>
+              <div class="data-group">
+                <label>Emergency Contact</label>
+                <p>{{ app.patient.emergencyContact }}</p>
+              </div>
+              @if (app.notes) {
+                <div class="data-group full-width notes-box">
+                  <label>Patient's Notes</label>
+                  <p>{{ app.notes }}</p>
+                </div>
+              }
+              <button matButton="filled" (click)="viewPatientDetails(app.patient.id,app.id)">More Details</button>
+            </div>
+          </mat-expansion-panel>
+          } @empty {
+            <div class="no-data">No patients booked for this time slot.</div>
+          }
+        </div>
+      </mat-expansion-panel>
+      }
+    </div>
+  </main>
+</div>

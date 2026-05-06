@@ -1,0 +1,152 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    @if (patientDetailsWithAppointments()?.patient; as patient) {
+      <div class="patient-profile-card mat-elevation-z3">
+        <div class="profile-header">
+          <div class="icon-blob">
+            {{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}
+          </div>
+          <h2>{{ patient.firstName }} {{ patient.lastName }}</h2>
+          <span class="blood-badge">Blood Group: {{ BloodGroupLabel[patient.bloodGroup] }}</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="profile-details">
+          <div class="info-row">
+            <mat-icon>cake</mat-icon>
+            <div>
+              <label>Age / Gender</label>
+              <p>{{ patient.age }} yrs • {{ patient.gender }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <label>Contact</label>
+              <p>{{ patient.phone }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>contact_emergency</mat-icon>
+            <div>
+              <label>Emergency Contact</label>
+              <p>{{ patient.emergencyContact }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </aside>
+
+  <main class="content-area">
+    <div class="content-header">
+      <mat-icon>calendar_today</mat-icon>
+      <h1>Upcoming Appointments</h1>
+    </div>
+
+    <div class="timeline-container">
+      <div class="add-appointment-ghost mat-elevation-z1" routerLink="/patient/make-appointment">
+        <div class="ghost-content">
+          <div class="plus-icon-circle">
+            <mat-icon>add</mat-icon>
+          </div>
+          <div class="text-group">
+            <strong>Schedule New Appointment</strong>
+            <span>Book a new slot for a consultation</span>
+          </div>
+        </div>
+      </div>
+      @if (patientDetailsWithAppointments()?.appointments; as appointments) {
+        <div class="apt-list-container">
+            @for (appt of appointments; track appt.id) {
+              <mat-expansion-panel class="apt-card-item" hideToggle="false">
+                <mat-expansion-panel-header expandedHeight="92px" collapsedHeight="92px">
+                  <mat-panel-title class="apt-header-main">
+                    <div class="apt-date-badge">
+                      <span class="apt-date-val">{{ appt.date }}</span>
+                    </div>
+                    <div class="apt-identity">
+                      <span class="apt-dr-name"
+                        >Dr. {{ appt.doctor.firstName }} {{ appt.doctor.lastName }}</span
+                      >
+                      <span class="apt-dr-spec">{{ appt.doctor.specialization }}</span>
+                    </div>
+                  </mat-panel-title>
+
+                  <mat-panel-description class="apt-header-meta">
+                    <div class="apt-time-tag">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ appt.startTime }}</span>
+                    </div>
+                    <span class="apt-status-chip" [attr.data-status]="appt.status">
+                      {{ appt.status }}
+                    </span>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="apt-expanded-details">
+                  <div class="apt-info-grid">
+                    <div class="apt-info-block">
+                      <mat-icon>medical_information</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Reason for Visit</label>
+                        <p>{{ appt.reason }}</p>
+                      </div>
+                    </div>
+
+                    <div class="apt-info-block">
+                      <mat-icon>description</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Clinical Notes</label>
+                        <p>{{ appt.notes }}</p>
+                      </div>
+                    </div>
+
+                    <div class="apt-info-block">
+                      <mat-icon>contact_phone</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Doctor Contact</label>
+                        <p>{{ appt.doctor.phone }}</p>
+                      </div>
+                    </div>
+
+                    @if (appt.prescription; as prescription) {
+                      <div class="apt-info-block">
+                        <mat-icon>medical_information</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Diagnosis</label>
+                          <p>{{ prescription.diagnosis }}</p>
+                        </div>
+                      </div>
+
+                      <div class="apt-info-block">
+                        <mat-icon>format_list_numbered</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Medication Notes</label>
+                          <p>{{ prescription.medicationNotes }}</p>
+                        </div>
+                      </div>
+
+                      <div class="apt-info-block">
+                        <mat-icon>thumb_up</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Advice</label>
+                          <p>{{ prescription.advice }}</p>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            }
+          </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>event_busy</mat-icon>
+          <p>No appointments found in the system.</p>
+        </div>
+      }
+    </div>
+  </main>
+</div>

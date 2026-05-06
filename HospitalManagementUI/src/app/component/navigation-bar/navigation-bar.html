@@ -1,0 +1,62 @@
+<mat-toolbar>
+  <span routerLink="/" style="cursor: pointer">Hospital Management</span>
+
+  <span class="spacer"></span>
+
+  <div class="nav-tabs">
+    @if (authService.isLoggedIn()) {
+      @if (userDetails?.role === 'DOCTOR') {
+        <button matButton routerLink="doctor/appointments">
+          <mat-icon matPrefix>emergency</mat-icon>
+          Appointment
+        </button>
+        <button matButton routerLink="doctor/slot">
+          <mat-icon matPrefix>emergency</mat-icon>
+          Slot
+        </button>
+      } @else if (userDetails?.role == 'PATIENT') {
+        <button matButton routerLink="patient/appointments">
+          <mat-icon matPrefix>emergency</mat-icon>
+          Appointment
+        </button>
+      } @else if (userDetails?.role == 'STAFF') {
+        <button matButton routerLink="patient/make-appointment/new">
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          Make Appointment
+        </button>
+
+        <button matButton (click)="logout()">
+          <mat-icon matPrefix>power_settings_new</mat-icon>
+          Logout
+        </button>
+      }
+    }
+  </div>
+
+  @if (authService.isLoggedIn()) {
+    @if (authService.getRole() == 'PATIENT') {
+      <button matIconButton routerLink="/patient/profile">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    } @else if (authService.getRole() == 'DOCTOR') {
+      <button matIconButton routerLink="/doctor/profile">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    }
+  } @else {
+    <div class="auth-buttons">
+      <button mat-flat-button routerLink="doctor/auth">
+        Doctor Login
+        <mat-icon>medical_services</mat-icon>
+      </button>
+      <button mat-flat-button routerLink="patient/auth">
+        Patient Login
+        <mat-icon>person</mat-icon>
+      </button>
+      <button mat-flat-button routerLink="staff/auth">
+        Staff Login
+        <mat-icon>person</mat-icon>
+      </button>
+    </div>
+  }
+</mat-toolbar>

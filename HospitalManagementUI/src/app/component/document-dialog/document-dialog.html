@@ -1,0 +1,40 @@
+<mat-dialog-content>
+  <div class="content-header">
+    <mat-icon>description</mat-icon>
+    <h1>Upload Documents</h1>
+  </div>
+  <div class="upload-section">
+    <input
+      type="file"
+      #fileInput
+      multiple
+      (change)="onFilesSelected($event)"
+      style="display: none"
+    />
+
+    <button mat-raised-button color="primary" (click)="fileInput.click()">
+      <mat-icon>upload_file</mat-icon>
+      Select Documents
+    </button>
+
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="onUpload()"
+      [disabled]="selectedFiles.length === 0 || isUploading()"
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      Upload {{ selectedFiles.length }} Document(s)
+    </button>
+
+    <div class="queue-list">
+      @for (item of selectedFiles; track item.name) {
+        <div class="upload-item">
+          <div class="file-info">
+            <span>{{ item.name }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</mat-dialog-content>

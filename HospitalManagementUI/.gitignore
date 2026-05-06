@@ -1,0 +1,36 @@
+# --- Dependencies ---
+node_modules/
+
+# --- Build Output ---
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+/.angular/cache/
+
+# --- Environment Secrets ---
+# Ignore specific environment files if they contain API keys
+src/environments/environment.prod.ts
+
+# --- Logs and Testing ---
+npm-debug.log
+yarn-error.log
+/coverage/
+/typings/
+testem.log
+/libpeerconnection.log
+__screenshots__/
+
+# --- IDEs ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+.history/
+
+# --- System ---
+.DS_Store
+Thumbs.db

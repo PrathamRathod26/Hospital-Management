@@ -1,0 +1,73 @@
+<div class="auth-container">
+  <div class="auth-card" [class.is-register]="selectedTabIndex === 1">
+    <div class="auth-header">
+      <h2>Staff Authentication</h2>
+      <p>Access the internal management portal</p>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" color="primary" animationDuration="500ms">
+      <!-- Login Tab -->
+      <mat-tab label="Login">
+        <div class="tab-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="Enter staff email" required />
+              <mat-icon matPrefix>email</mat-icon>
+              @if (loginForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required />
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <button mat-button color="primary" type="submit" [disabled]="loginForm.invalid" class="submit-button">
+              Login
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Register Tab -->
+      <mat-tab label="Register">
+        <div class="tab-content">
+          <p class="register-prompt">Create a staff account to manage hospital operations.</p>
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="register-form">
+            
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="Enter staff email" />
+              <mat-icon matPrefix>email</mat-icon>
+              @if (registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Password</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (registerForm.get('password')?.touched && registerForm.get('password')?.hasError('minlength')) {
+                <mat-error>Password must be at least 6 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <button mat-raised-button color="accent" type="submit" [disabled]="registerForm.invalid" class="submit-button full-row">
+              Register Staff
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

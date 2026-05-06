@@ -1,0 +1,204 @@
+<div class="container">
+  <aside class="sidebar">
+    <form [formGroup]="doctorFilterForm">
+      <h3>Filter Doctor</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="docName" placeholder="Name" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Specialization</mat-label>
+        <input matInput formControlName="docSpecialization" placeholder="Specialization" />
+      </mat-form-field>
+    </form>
+
+    <mat-nav-list>
+      <div mat-subheader>Available Doctors</div>
+      @for (doctor of doctors(); track doctor.id) {
+        <a
+          mat-list-item
+          (click)="selectDoctor(doctor)"
+          [class.selected]="selectedDoctor()?.id === doctor.id"
+        >
+          <mat-icon matListItemIcon>person</mat-icon>
+          <div matListItemTitle>{{ doctor.firstName }} {{ doctor.lastName }}</div>
+          <div matListItemLine>{{ doctor.specialization }}</div>
+        </a>
+      } @empty {
+        <p class="empty-state">No doctors found.</p>
+      }
+    </mat-nav-list>
+  </aside>
+
+  <main class="content">
+    @if (selectedDoctor()) {
+      <mat-card appearance="outlined" [formGroup]="appointmentForm">
+        <mat-card-header>
+          <mat-card-title>
+            Schedule for Dr. {{ selectedDoctor()?.firstName }} {{ selectedDoctor()?.lastName }}
+          </mat-card-title>
+          <mat-card-subtitle>{{ selectedDoctor()?.specialization }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <h4 class="section-title">1. Select Available Slot</h4>
+          <div class="slot-grid">
+            @for (slot of doctorSlots(); track slot.id) {
+              <mat-chip-option
+                color="primary"
+                [selected]="selectedSlotId() === slot.id"
+                (selectionChange)="onSlotSelectionChange(slot.id, $event.selected)"
+                [disabled]="slot.status !== SlotStatus.AVAILABLE"
+              >
+                {{ slot.startTime }} - {{ slot.endTime }}
+              </mat-chip-option>
+            } @empty {
+              <p>No available slots for the selected date.</p>
+            }
+          </div>
+
+          <div class="booking-details" [class.disabled]="!doctorSlots().length">
+            <h4 class="section-title">2. Account Credentials</h4>
+            <div class="input-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Email Address</mat-label>
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  placeholder="email@example.com"
+                />
+                <mat-icon matSuffix>email</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input
+                  matInput
+                  type="password"
+                  formControlName="password"
+                  placeholder="Min 8 characters"
+                />
+                <mat-icon matSuffix>lock</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <mat-divider class="section-divider"></mat-divider>
+
+            <h4 class="section-title">3. Patient Details</h4>
+            <div class="registration-grid">
+              <mat-form-field appearance="outline" class="one-half">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-half">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-half">
+                <mat-label>Phone Number</mat-label>
+                <input matInput formControlName="phone" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-half">
+                <mat-label>Emergency Contact</mat-label>
+                <input matInput formControlName="emergencyContact" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-third">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender">
+                  <mat-option [value]="'MALE'">Male</mat-option>
+                  <mat-option [value]="'FEMALE'">Female</mat-option>
+                  <mat-option [value]="'OTHER'">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-third">
+                <mat-label>Blood Group</mat-label>
+                <mat-select formControlName="bloodGroup">
+                  <mat-option [value]="'A_POSITIVE'">A+</mat-option>
+                  <mat-option [value]="'A_NEGATIVE'">A-</mat-option>
+                  <mat-option [value]="'B_POSITIVE'">B+</mat-option>
+                  <mat-option [value]="'B_NEGATIVE'">B-</mat-option>
+                  <mat-option [value]="'O_POSITIVE'">O+</mat-option>
+                  <mat-option [value]="'O_NEGATIVE'">O-</mat-option>
+                  <mat-option [value]="'AB_POSITIVE'">AB+</mat-option>
+                  <mat-option [value]="'AB_NEGATIVE'">AB-</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="one-third">
+                <mat-label>Age</mat-label>
+                <input matInput type="number" formControlName="age" />
+              </mat-form-field>
+            </div>
+
+            <mat-divider class="section-divider"></mat-divider>
+
+            <h4 class="section-title">4. Appointment Details</h4>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Reason for Visit</mat-label>
+              <input
+                matInput
+                formControlName="reason"
+                placeholder="Describe your symptoms"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Additional Notes (Optional)</mat-label>
+              <textarea matInput formControlName="notes" rows="2"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="booking-details">
+            <div class="document-container"><h3 class="section-title">Select Documents</h3>
+            <div class="document-list">
+              @for (file of selectedFiles; track file.name) {
+                <div class="document-item">
+                  <div>{{ file.name }}</div>
+                  <button mat-icon-button (click)="removeSelectedFile(file.name)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              } @empty {
+                <div class="empty-state">No document</div>
+              }
+            </div>
+            <input
+              type="file"
+              #fileInput
+              multiple
+              (change)="onFilesSelected($event)"
+              style="display: none"
+            />
+
+            <button mat-button color="primary" (click)="fileInput.click()">
+              <mat-icon>upload_file</mat-icon>
+              Select Documents
+            </button></div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="appointmentForm.invalid || !selectedSlotId()"
+            (click)="makeAppointmentV2()"
+          >
+            Register & Book
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @else {
+      <div class="placeholder-view">
+        <mat-icon>calendar_today</mat-icon>
+        <p>Please select a doctor to view their availability.</p>
+      </div>
+    }
+  </main>
+</div>

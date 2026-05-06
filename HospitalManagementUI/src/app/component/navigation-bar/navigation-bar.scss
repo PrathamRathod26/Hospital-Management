@@ -1,0 +1,21 @@
+mat-toolbar {
+  background-color: var(--mat-sys-primary-container);
+}
+
+button[matButton] {
+  color: var(--mat-sys-on-primary-container)
+}
+
+button[matIconButton] {
+  color: var(--mat-sys-on-primary-container)
+}
+
+.auth-buttons{
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

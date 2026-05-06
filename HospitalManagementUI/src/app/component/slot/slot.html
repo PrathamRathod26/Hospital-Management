@@ -1,0 +1,91 @@
+<div class="management-container">
+  <header class="table-header-section">
+    <div>
+      <h1>Slot Management</h1>
+      <p>Configure your availability and manage booking caps</p>
+    </div>
+    <button mat-fab extended color="primary" (click)="addNewSlot()">
+      <mat-icon>add</mat-icon>
+      Create New Slot
+    </button>
+  </header>
+
+  <div class="slots-table">
+    <div class="table-row header-row">
+      <div class="col date">Date</div>
+      <div class="col time">Time Window</div>
+      <div class="col capacity">Capacity</div>
+      <div class="col status">Utilization</div>
+      <div class="col actions">Actions</div>
+    </div>
+
+    @for (slot of slots(); track slot.id) {
+      <div
+        class="table-row slot-data-row"
+        [class.high-demand]="slot.bookedCount >= slot.capacity * 0.8"
+      >
+        <div class="col date">
+          <mat-icon class="row-icon">calendar_today</mat-icon>
+          <div class="date-text">
+            <span class="main">{{ slot.date }}</span>
+          </div>
+        </div>
+
+        <div class="col time">
+          <mat-icon class="row-icon">history_toggle_off</mat-icon>
+          <span>{{ slot.startTime.slice(0, 5) }} — {{ slot.endTime.slice(0, 5) }}</span>
+        </div>
+
+        <div class="col status">
+          <div class="status-pill" [class]="slot.status.toLowerCase()">
+            @switch (slot.status) {
+              @case ('AVAILABLE') {
+                <mat-icon>check_circle</mat-icon>
+                <span>Available</span>
+              }
+              @case ('FULL') {
+                <mat-icon>group</mat-icon>
+                <span>Full</span>
+              }
+              @case ('CANCELLED') {
+                <mat-icon>event_busy</mat-icon>
+                <span>Cancelled</span>
+              }
+              @case ('DISABLED') {
+                <mat-icon>lock</mat-icon>
+                <span>Disabled</span>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="col status">
+          <div class="progress-wrapper">
+            <div class="usage-stats">
+              <span>{{ slot.bookedCount }} Booked</span>
+              <span class="percent">{{ slot.bookedCount / slot.capacity | percent }}</span>
+            </div>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="(slot.bookedCount / slot.capacity) * 100"
+            ></mat-progress-bar>
+          </div>
+        </div>
+
+        <div class="col actions">
+          <button mat-icon-button matTooltip="Edit Slot" (click)="editSlot(slot)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Slot Patient List">
+            <mat-icon>list_alt</mat-icon>
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-row">
+        <mat-icon>event_busy</mat-icon>
+        <p>No slots configured for the selected period.</p>
+      </div>
+    }
+  </div>
+</div>

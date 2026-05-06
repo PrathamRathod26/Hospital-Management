@@ -1,0 +1,325 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    <div class="patient-profile-card mat-elevation-z3">
+      @if (patient(); as patient) {
+        <div class="profile-header">
+          <div class="icon-blob">
+            {{ patient.firstName!.charAt(0) }}{{ patient.lastName!.charAt(0) }}
+          </div>
+          <h2>{{ patient.firstName }} {{ patient.lastName }}</h2>
+          <span class="blood-badge">Blood Group: {{ BloodGroupLabel[patient.bloodGroup] }}</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="profile-details">
+          <div class="info-row">
+            <mat-icon>cake</mat-icon>
+            <div>
+              <label>Age / Gender</label>
+              <p>{{ patient.age }} yrs • {{ patient.gender }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <label>Contact</label>
+              <p>{{ patient.phone }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>contact_emergency</mat-icon>
+            <div>
+              <label>Emergency Contact</label>
+              <p>{{ patient.emergencyContact }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-stack">
+          <button
+            mat-button
+            class="item"
+            [class.active-link]="appointmentViewFlag()"
+            (click)="showAppointments()"
+          >
+            <mat-icon>event</mat-icon>
+            <span>Appointments</span>
+          </button>
+
+          <button
+            mat-button
+            class="item"
+            [class.active-link]="DocumentViewFlag()"
+            (click)="showDocuments()"
+          >
+            <mat-icon>description</mat-icon>
+            <span>Documents</span>
+          </button>
+
+          <button
+            mat-button
+            class="item"
+            [class.active-link]="draftViewFlag()"
+            (click)="showDrafts()"
+          >
+            <mat-icon>edit_note</mat-icon>
+            <span>Drafts</span>
+          </button>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="button-stack">
+          <button mat-raised-button class="item" (click)="logout()">
+            <mat-icon>power_settings_new</mat-icon>
+            <span>Logout</span>
+          </button>
+        </div>
+      }
+    </div>
+  </aside>
+  <main class="content-area">
+    @if (appointmentViewFlag()) {
+      <div class="apt-dashboard-layout">
+        <div class="apt-hero-action" [routerLink]="['/patient/make-appointment']">
+          <div class="apt-hero-inner">
+            <div class="apt-icon-wrapper">
+              <mat-icon>add_task</mat-icon>
+            </div>
+            <div class="apt-hero-text">
+              <span class="apt-hero-title">Schedule New Appointment</span>
+              <span class="apt-hero-subtitle"
+                >Book a new slot for a consultation with our specialists</span
+              >
+            </div>
+          </div>
+        </div>
+
+        @if (appointments()) {
+          <div class="apt-list-container">
+            @for (appt of appointments(); track appt.id) {
+              <mat-expansion-panel class="apt-card-item" hideToggle="false">
+                <mat-expansion-panel-header expandedHeight="92px" collapsedHeight="92px">
+                  <mat-panel-title class="apt-header-main">
+                    <div class="apt-date-badge">
+                      <span class="apt-date-val">{{ appt.date }}</span>
+                    </div>
+                    <div class="apt-identity">
+                      <span class="apt-dr-name"
+                        >Dr. {{ appt.doctor.firstName }} {{ appt.doctor.lastName }}</span
+                      >
+                      <span class="apt-dr-spec">{{ appt.doctor.specialization }}</span>
+                    </div>
+                  </mat-panel-title>
+
+                  <mat-panel-description class="apt-header-meta">
+                    <div class="apt-time-tag">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ appt.startTime }}</span>
+                    </div>
+                    <span class="apt-status-chip" [attr.data-status]="appt.status">
+                      {{ appt.status }}
+                    </span>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="apt-expanded-details">
+                  <div class="apt-info-grid">
+                    <div class="apt-info-block">
+                      <mat-icon>medical_information</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Reason for Visit</label>
+                        <p>{{ appt.reason }}</p>
+                      </div>
+                    </div>
+
+                    <div class="apt-info-block">
+                      <mat-icon>description</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Clinical Notes</label>
+                        <p>{{ appt.notes }}</p>
+                      </div>
+                    </div>
+
+                    <div class="apt-info-block">
+                      <mat-icon>contact_phone</mat-icon>
+                      <div class="apt-info-content">
+                        <label>Doctor Contact</label>
+                        <p>{{ appt.doctor.phone }}</p>
+                      </div>
+                    </div>
+
+                    @if (appt.prescription; as prescription) {
+                      <div class="apt-info-block">
+                        <mat-icon>medical_information</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Diagnosis</label>
+                          <p>{{ prescription.diagnosis }}</p>
+                        </div>
+                      </div>
+
+                      <div class="apt-info-block">
+                        <mat-icon>format_list_numbered</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Medication Notes</label>
+                          <p>{{ prescription.medicationNotes }}</p>
+                        </div>
+                      </div>
+
+                      <div class="apt-info-block">
+                        <mat-icon>thumb_up</mat-icon>
+                        <div class="apt-info-content">
+                          <label>Advice</label>
+                          <p>{{ prescription.advice }}</p>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            }
+          </div>
+        } @else {
+          <div class="apt-empty-state">
+            <div class="apt-empty-visual">
+              <mat-icon>event_busy</mat-icon>
+            </div>
+            <h3>No Appointments</h3>
+            <p>Your medical timeline is currently clear.</p>
+          </div>
+        }
+      </div>
+    } @else if (DocumentViewFlag()) {
+      <div class="doc-vault-layout">
+        <div class="doc-upload-trigger" style="cursor: pointer" (click)="addNewDocument()">
+          <div class="doc-upload-inner">
+            <div class="doc-upload-icon">
+              <mat-icon>upload_file</mat-icon>
+            </div>
+            <div class="doc-upload-text">
+              <span class="doc-upload-title">Add New Document</span>
+              <span class="doc-upload-subtitle"
+                >Upload lab results, prescriptions, or medical records</span
+              >
+            </div>
+          </div>
+        </div>
+
+        @if (documentData()) {
+          <div class="doc-grid">
+            @for (doc of documentData(); track doc.id) {
+              <div class="doc-card" (click)="openDocument(doc)">
+                <div class="doc-preview-wrapper">
+                  <img [src]="doc.documentUrl" loading="lazy" alt="Document Preview" />
+                </div>
+                <div class="doc-info">
+                  <span class="doc-name">{{ doc.fileName || 'Medical Record' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="doc-empty-view">
+            <div class="doc-empty-icon">
+              <mat-icon>folder_off</mat-icon>
+            </div>
+            <h3>No Documents Found</h3>
+            <p>Your digital medical archive is currently empty.</p>
+          </div>
+        }
+      </div>
+    } @else if (draftViewFlag()) {
+      <div class="draft-workspace">
+        <div class="draft-create-trigger" [routerLink]="['/patient/make-appointment']">
+          <div class="draft-create-content">
+            <div class="draft-create-icon">
+              <mat-icon>add_task</mat-icon>
+            </div>
+            <div class="draft-create-text">
+              <span class="draft-create-title">Create New Appointment</span>
+              <span class="draft-create-subtitle">Start a fresh booking process from scratch</span>
+            </div>
+          </div>
+        </div>
+
+        @if (drafts() && drafts()!.length > 0) {
+          <div class="draft-list">
+            @for (draft of drafts(); track draft.id) {
+              <mat-card class="draft-entry-card" appearance="outlined">
+                <mat-card-content>
+                  <div class="draft-entry-header">
+                    <div class="draft-identity-group">
+                      <div class="draft-id-badge">
+                        <mat-icon>edit_note</mat-icon>
+                      </div>
+                      <div class="draft-subject">
+                        <small class="draft-label">REASON FOR VISIT</small>
+                        <span class="draft-main-text">{{ draft.reason || 'Untitled Draft' }}</span>
+                      </div>
+                    </div>
+                    <div class="draft-status-tag">
+                      {{ draft.status }}
+                    </div>
+                  </div>
+
+                  <div class="draft-entry-body">
+                    <div class="draft-info-row">
+                      <div class="draft-info-header">
+                        <mat-icon class="draft-row-icon">notes</mat-icon>
+                        <label>Internal Notes</label>
+                      </div>
+                      <div class="draft-row-content">
+                        <p>{{ draft.notes || 'No notes added to this draft.' }}</p>
+                      </div>
+                    </div>
+
+                    <div class="draft-info-row">
+                      <div class="draft-info-header">
+                        <mat-icon class="draft-row-icon">attachment</mat-icon>
+                        <label>Attachments</label>
+                      </div>
+                      <div class="draft-row-content">
+                        <div class="draft-attachment-chips">
+                          @if (draft.documents) {
+                            @for (doc of draft!.documents; track doc.id) {
+                              <span class="attachment-pill">{{ doc.fileName }}</span>
+                            }
+                          } @else {
+                            <p class="empty-inline">No documents attached</p>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="draft-entry-footer">
+                    <button mat-button class="draft-discard-btn" (click)="onDelete(draft.id)">
+                      <mat-icon>delete_outline</mat-icon> Discard
+                    </button>
+                    <button mat-flat-button class="draft-resume-btn" (click)="onResume(draft)">
+                      <mat-icon>play_arrow</mat-icon> Resume Booking
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+        } @else {
+          <div class="draft-empty-state">
+            <div class="draft-empty-artwork">
+              <mat-icon>auto_stories</mat-icon>
+            </div>
+            <h3>All caught up</h3>
+            <p>You have no pending appointment drafts.</p>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="view-selector-prompt">
+        <mat-icon>touch_app</mat-icon>
+        <p>Select a category from the sidebar to view details</p>
+      </div>
+    }
+  </main>
+</div>

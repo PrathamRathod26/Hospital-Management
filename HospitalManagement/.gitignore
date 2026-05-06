@@ -1,0 +1,35 @@
+# --- Build and Output ---
+target/
+build/
+bin/
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+# --- Spring Boot & Config ---
+# Ignore the actual properties file containing secrets
+src/main/resources/application.properties
+
+# --- Maven/Gradle Wrapper ---
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+/build/
+
+# --- IDEs ---
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.sts4-cache
+.vscode/
+
+# --- System ---
+.DS_Store
+Thumbs.db
+log/
+*.log

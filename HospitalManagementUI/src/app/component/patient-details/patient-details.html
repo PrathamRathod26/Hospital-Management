@@ -1,0 +1,157 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    <div class="patient-profile-card mat-elevation-z3">
+      @if (patientDetails()?.patient; as patient) {
+        <div class="profile-header">
+          <div class="icon-blob">
+            {{ patient.firstName!.charAt(0) }}{{ patient.lastName!.charAt(0) }}
+          </div>
+          <h2>{{ patient.firstName }} {{ patient.lastName }}</h2>
+          <span class="blood-badge">Blood Group: {{ BloodGroupLabel[patient.bloodGroup] }}</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="profile-details">
+          <div class="info-row">
+            <mat-icon>cake</mat-icon>
+            <div>
+              <label>Age / Gender</label>
+              <p>{{ patient.age }} yrs • {{ patient.gender }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <label>Contact</label>
+              <p>{{ patient.phone }}</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <mat-icon>contact_emergency</mat-icon>
+            <div>
+              <label>Emergency Contact</label>
+              <p>{{ patient.emergencyContact }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-stack">
+          <button
+            mat-button
+            class="item"
+            [class.active-link]="prescriptionFlag()"
+            (click)="showPrescription()"
+          >
+            <mat-icon>event</mat-icon>
+            <span>Prescription</span>
+          </button>
+
+          <button
+            mat-button
+            class="item"
+            [class.active-link]="documentFlag()"
+            (click)="showDocuments()"
+          >
+            <mat-icon>description</mat-icon>
+            <span>Documents</span>
+          </button>
+        </div>
+      }
+    </div>
+  </aside>
+  <main class="content-area">
+    @if (documentFlag()) {
+      <div class="doc-grid">
+        @if (patientDetails()?.documents; as documents) {
+          @for (doc of documents; track doc.id) {
+            <div class="doc-card" (click)="openDocument(doc)">
+              <div class="doc-preview-wrapper">
+                <img [src]="doc.documentUrl" loading="lazy" alt="Document Preview" />
+              </div>
+              <div class="doc-info">
+                <span class="doc-name">{{ doc.fileName || 'Medical Record' }}</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="empty-state">
+            <mat-icon>event_busy</mat-icon>
+            <p>No Documents found in the system.</p>
+          </div>
+        }
+      </div>
+    } @else if (prescriptionFlag()) {
+      @if (patientDetails()?.appointment; as appointment) {
+        <mat-card class="appointment-card">
+          <mat-card-header>
+            <div class="header-main">
+              <mat-card-title>{{ appointment.date }} at {{ appointment.startTime }}</mat-card-title>
+            </div>
+            <span class="status-badge" [attr.data-status]="appointment.status">
+              {{ appointment.status }}
+            </span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <section class="reason-section">
+              <span class="label">Reason for Visit</span>
+              <p class="reason-text">{{ appointment.reason }}</p>
+
+              @if (appointment.notes) {
+                <span class="label">General Notes</span>
+                <p class="notes-text">{{ appointment.notes }}</p>
+              }
+            </section>
+
+            <mat-divider></mat-divider>
+
+            <div class="prescription-wrapper">
+              <h3 class="section-title">Prescription Details</h3>
+
+              @if (appointment.prescription; as prescription) {
+                <div class="display-grid">
+                  <div class="info-block">
+                    <span class="label">Diagnosis</span>
+                    <p class="value">{{ prescription.diagnosis }}</p>
+                  </div>
+                  <div class="info-block">
+                    <span class="label">Medication Notes</span>
+                    <p class="value">{{ prescription.medicationNotes }}</p>
+                  </div>
+                  <div class="info-block">
+                    <span class="label">Advice</span>
+                    <p class="value">{{ prescription.advice }}</p>
+                  </div>
+                </div>
+              } @else {
+                <form
+                  [formGroup]="prescriptionForm"
+                  class="entry-form"
+                  (ngSubmit)="addPrescription(appointment.id)"
+                >
+                  <mat-form-field appearance="outline">
+                    <mat-label>Diagnosis</mat-label>
+                    <input matInput formControlName="diagnosis" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Medication Notes</mat-label>
+                    <textarea matInput formControlName="medicationNotes"></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>General Advice</mat-label>
+                    <textarea matInput formControlName="advice"></textarea>
+                  </mat-form-field>
+
+                  <button mat-flat-button color="primary">Submit Prescription</button>
+                </form>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+  </main>
+</div>

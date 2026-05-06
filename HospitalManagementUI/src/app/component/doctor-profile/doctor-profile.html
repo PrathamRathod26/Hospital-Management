@@ -1,0 +1,200 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    <div class="patient-profile-card mat-elevation-z3">
+      <div class="profile-header">
+        <div class="icon-blob">
+          {{ doctorProfile()?.firstName?.charAt(0) }}{{ doctorProfile()?.lastName?.charAt(0) }}
+        </div>
+        <h2>Dr. {{ doctorProfile()?.firstName }} {{ doctorProfile()?.lastName }}</h2>
+        <span class="specialization-badge">{{ doctorProfile()?.specialization }}</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="profile-details">
+        <div class="info-row">
+          <mat-icon>verified_user</mat-icon>
+          <div>
+            <label>License Number</label>
+            <p>{{ doctorProfile()?.licenseNumber }}</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <mat-icon>phone_iphone</mat-icon>
+          <div>
+            <label>Contact Number</label>
+            <p>{{ doctorProfile()?.phone }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-stack">
+        <button
+          mat-button
+          class="item"
+          [class.active-link]="appointmentViewFlag()"
+          (click)="showAppointments()"
+        >
+          <mat-icon>event</mat-icon>
+          <span>Appointments</span>
+        </button>
+
+        <button mat-button class="item" [class.active-link]="slotViewFlag()" (click)="showSlots()">
+          <mat-icon>description</mat-icon>
+          <span>Time Slots</span>
+        </button>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="button-stack">
+        <button mat-raised-button color="warn" class="item" (click)="logout()">
+          <mat-icon>power_settings_new</mat-icon>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content-area">
+    @if (appointmentViewFlag()) {
+      <div class="timeline-container">
+        @if (appointments()) {
+          @for (appt of appointments(); track appt.id) {
+            <mat-expansion-panel
+              class="timeline-card"
+              [class.scheduled]="appt.status.toString() === 'SCHEDULED'"
+            >
+              <mat-expansion-panel-header expandedHeight="80px" collapsedHeight="80px">
+                <mat-panel-title>
+                  <div class="date-box">
+                    <span class="day">{{ appt.date }}</span>
+                  </div>
+                  <div class="title-text">
+                    @if (appt.patient.gender.toString() === 'MALE') {
+                      <strong>Mr. {{ appt.patient.firstName }} {{ appt.patient.lastName }}</strong>
+                    } @else if (appt.patient.gender.toString() === 'FEMALE') {
+                      <strong>Ms. {{ appt.patient.firstName }} {{ appt.patient.lastName }}</strong>
+                    } @else {
+                      <strong>{{ appt.patient.firstName }} {{ appt.patient.lastName }}</strong>
+                    }
+                  </div>
+                </mat-panel-title>
+
+                <mat-panel-description>
+                  <div class="time-info">
+                    <mat-icon>schedule</mat-icon>
+                    {{ appt.startTime }}
+                  </div>
+                  <span class="status-pill">{{ appt.status }}</span>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="expanded-content">
+                <div class="meta-grid">
+                  <div class="meta-item">
+                    <mat-icon>medication</mat-icon>
+                    <div>
+                      <label>Reason for Visit</label>
+                      <p>{{ appt.reason }}</p>
+                    </div>
+                  </div>
+                  <div class="meta-item">
+                    <mat-icon>notes</mat-icon>
+                    <div>
+                      <label>Clinical Notes</label>
+                      <p>{{ appt.notes }}</p>
+                    </div>
+                  </div>
+                  <div class="meta-item">
+                    <mat-icon>call</mat-icon>
+                    <div>
+                      <label>Patient Contact</label>
+                      <p>{{ appt.patient.phone }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          }
+        } @else {
+          <div class="empty-state">
+            <mat-icon>event_busy</mat-icon>
+            <p>No appointments found in the system.</p>
+          </div>
+        }
+      </div>
+    } @else if (slotViewFlag()) {
+      <div class="slots-table">
+        <div class="table-row header-row">
+          <div class="col date">Date</div>
+          <div class="col time">Time Window</div>
+          <div class="col status">Status</div>
+          <div class="col usage">Utilization</div>
+        </div>
+
+        @for (slot of slots(); track slot.date + slot.startTime) {
+          <div
+            class="table-row slot-data-row"
+            [class.high-demand]="slot.bookedCount >= slot.capacity * 0.8"
+          >
+            <div class="col date">
+              <mat-icon class="row-icon">calendar_today</mat-icon>
+              <div class="date-text">
+                <span class="main">{{ slot.date }}</span>
+              </div>
+            </div>
+
+            <div class="col time">
+              <mat-icon class="row-icon">history_toggle_off</mat-icon>
+              <span>{{ slot.startTime.slice(0, 5) }} — {{ slot.endTime.slice(0, 5) }}</span>
+            </div>
+
+            <div class="col status">
+              <div class="status-pill" [class]="slot.status.toLowerCase()">
+                @switch (slot.status) {
+                  @case ('AVAILABLE') {
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Available</span>
+                  }
+                  @case ('FULL') {
+                    <mat-icon>group</mat-icon>
+                    <span>Full</span>
+                  }
+                  @case ('CANCELLED') {
+                    <mat-icon>event_busy</mat-icon>
+                    <span>Cancelled</span>
+                  }
+                  @case ('DISABLED') {
+                    <mat-icon>lock</mat-icon>
+                    <span>Disabled</span>
+                  }
+                }
+              </div>
+            </div>
+
+            <div class="col usage">
+              <div class="progress-wrapper">
+                <div class="usage-stats">
+                  <span>{{ slot.bookedCount }} / {{ slot.capacity }} Booked</span>
+                  <span class="percent">{{ slot.bookedCount / slot.capacity | percent }}</span>
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="(slot.bookedCount / slot.capacity) * 100"
+                ></mat-progress-bar>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-row">
+            <mat-icon>event_busy</mat-icon>
+            <p>No slots configured for the selected period.</p>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-msg">Select a menu item from the sidebar.</div>
+    }
+  </main>
+</div>

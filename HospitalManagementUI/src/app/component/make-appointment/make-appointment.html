@@ -1,0 +1,144 @@
+<div class="container">
+  <aside class="sidebar">
+    <form [formGroup]="doctorFilterForm">
+      <h3>Filter Doctor</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="docName" placeholder="Name" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Specialization</mat-label>
+        <input matInput formControlName="docSpecialization" placeholder="Specialization" />
+      </mat-form-field>
+    </form>
+    <mat-nav-list>
+      <div mat-subheader>Available Doctors</div>
+      @for (doctor of doctors(); track doctor.id) {
+        <a
+          mat-list-item
+          (click)="selectDoctor(doctor)"
+          [class.selected]="selectedDoctor()?.id === doctor.id"
+        >
+          <mat-icon matListItemIcon>person</mat-icon>
+          <div matListItemTitle>{{ doctor.firstName }} {{ doctor.lastName }}</div>
+          <div matListItemLine>{{ doctor.specialization }}</div>
+        </a>
+      } @empty {
+        <p class="empty-state">No doctors found.</p>
+      }
+    </mat-nav-list>
+  </aside>
+
+  <main class="content">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          @if (selectedDoctor()) {
+            Schedule for Dr. {{ selectedDoctor()?.firstName }} {{ selectedDoctor()?.lastName }}
+          } @else {
+            <div class="placeholder-view">
+              <mat-icon>calendar_today</mat-icon>
+              <p>Please select a doctor to view availability.</p>
+            </div>
+          }
+        </mat-card-title>
+        <mat-card-subtitle>{{ selectedDoctor()?.specialization }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (selectedDoctor()) {
+          <h4 class="section-title">Available Slots</h4>
+          <mat-chip-listbox class="slot-grid">
+            @for (slot of doctorSlots(); track slot.id) {
+              <mat-chip-option
+                color="primary"
+                [selected]="selectedSlotId() === slot.id"
+                (selectionChange)="onSlotSelectionChange(slot.id, $event.selected)"
+                [disabled]="slot.appointmentId != null || slot.status !== SlotStatus.AVAILABLE"
+              >
+                {{ slot.startTime }} - {{ slot.endTime }}
+              </mat-chip-option>
+            } @empty {
+              <p>No available slots for the selected date.</p>
+            }
+          </mat-chip-listbox>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined" [formGroup]="appointmentForm">
+      <mat-card-header>
+        <mat-card-title>
+          <h4 class="section-title">Booking Information</h4>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="booking-details">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Reason for Visit</mat-label>
+            <input
+              matInput
+              formControlName="reason"
+              placeholder="e.g. Annual Checkup, Consultation"
+              required
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Additional Notes</mat-label>
+            <textarea
+              matInput
+              formControlName="notes"
+              placeholder="Any specific concerns..."
+              rows="3"
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="booking-details">
+          <h3 class="section-title">Select Documents</h3>
+          <div class="document-list">
+            @for (file of selectedFiles; track file.name) {
+              <div class="document-item">
+                <div>{{ file.name }}</div>
+                <button mat-icon-button (click)="removeSelectedFile(file.name)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            } @empty {
+              <div class="empty-state">No document</div>
+            }
+          </div>
+          <input
+            type="file"
+            #fileInput
+            multiple
+            (change)="onFilesSelected($event)"
+            style="display: none"
+          />
+
+          <button mat-button color="primary" (click)="fileInput.click()">
+            <mat-icon>upload_file</mat-icon>
+            Select Documents
+          </button>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end" class="action-buttons">
+        <button mat-flat-button color="accent" (click)="makeAppointmentDraft()" type="button">
+          Save as Draft
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          [disabled]="appointmentForm.invalid"
+          (click)="onSubmit()"
+          type="submit"
+        >
+          Book Appointment
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </main>
+</div>

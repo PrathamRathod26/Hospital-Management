@@ -1,0 +1,136 @@
+<div class="auth-container">
+  <div class="auth-card" [class.is-register]="selectedTabIndex === 1">
+    <div class="auth-header">
+      <h2>Doctor Authentication</h2>
+      <p>Please enter your details to continue</p>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" color="primary" animationDuration="500ms">
+      
+      <mat-tab label="Login">
+        <div class="tab-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="Enter your email" required />
+              <mat-icon matPrefix>email</mat-icon>
+              @if (loginForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (loginForm.get('email')?.hasError('email')) {
+                <mat-error>Please enter a valid email</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Enter your password" required />
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" aria-label="Toggle password visibility">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (loginForm.get('password')?.hasError('required')) {
+                <mat-error>Password is required</mat-error>
+              }
+              @if (loginForm.get('password')?.hasError('minlength')) {
+                <mat-error>Password must be at least 6 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <button mat-button color="primary" type="submit" [disabled]="loginForm.invalid" class="submit-button">
+              Login
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Register">
+        <div class="tab-content">
+          <p class="register-prompt">Register now and login to access other pages!</p>
+          
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="register-form">
+            
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="Enter your email" />
+              <mat-icon matPrefix>email</mat-icon>
+              @if (registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (registerForm.get('email')?.touched && registerForm.get('email')?.hasError('email')) {
+                <mat-error>Please enter a valid email</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Password</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Create a password" />
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')) {
+                <mat-error>Password is required</mat-error>
+              }
+              @if (registerForm.get('password')?.touched && registerForm.get('password')?.hasError('minlength')) {
+                <mat-error>Password must be at least 8 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <hr class="form-divider full-row" />
+
+            <mat-form-field appearance="outline">
+              <mat-label>First Name</mat-label>
+              <input matInput formControlName="firstName" placeholder="Ex. John" />
+              @if (registerForm.get('firstName')?.touched && registerForm.get('firstName')?.hasError('required')) {
+                <mat-error>First name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name</mat-label>
+              <input matInput formControlName="lastName" placeholder="Ex. Doe" />
+              @if (registerForm.get('lastName')?.touched && registerForm.get('lastName')?.hasError('required')) {
+                <mat-error>Last name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Phone</mat-label>
+              <input matInput formControlName="phone" type="tel" />
+              @if (registerForm.get('phone')?.touched && registerForm.get('phone')?.hasError('required')) {
+                <mat-error>Phone number is required</mat-error>
+              }
+              @if (registerForm.get('phone')?.touched && registerForm.get('phone')?.hasError('pattern')) {
+                <mat-error>Phone number must be exactly 10 digits</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Specialization</mat-label>
+              <input matInput formControlName="specialization" type="tel" />
+              @if (registerForm.get('specialization')?.touched && registerForm.get('specialization')?.hasError('required')) {
+                <mat-error>Specialization is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>License Number</mat-label>
+              <input matInput formControlName="licenseNumber" type="tel" />
+              @if (registerForm.get('licenseNumber')?.touched && registerForm.get('licenseNumber')?.hasError('required')) {
+                <mat-error>License Number is required</mat-error>
+              }
+              @if (registerForm.get('licenseNumber')?.touched && registerForm.get('licenseNumber')?.hasError('minlength')) {
+                <mat-error>License Number must be at least 10 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <button mat-raised-button color="accent" type="submit" [disabled]="registerForm.invalid" class="submit-button full-row">
+              Register
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
